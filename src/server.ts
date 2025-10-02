@@ -3,6 +3,7 @@ import app from "./app";
 import dotenv from "dotenv";
 import { prisma } from "./config/db";
 import { envVar } from "./app/config/env";
+import { seedAdmin } from "./app/utils/seedAdmin";
 
 
 
@@ -31,6 +32,11 @@ async function startServer() {
     process.exit(1);
   }
 }
+
+(async() =>{
+  await startServer(),
+  await seedAdmin()
+})()
 
 
 process.on("SIGTERM", (err) => {
@@ -61,4 +67,3 @@ process.on("uncaughtException", (err) => {
     process.exit(1)
 })
 
-startServer();

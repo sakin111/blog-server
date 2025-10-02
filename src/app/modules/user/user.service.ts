@@ -4,24 +4,25 @@ import { prisma } from "../../../config/db";
 
 
 
-const getMeService = async(userId: string) =>{
-    const userInfo = await prisma.user.findUnique({
-        where:{
-            email:email
-        },
-            select: {
+export const getMeService = async (userId: string) => {
+  const user = await prisma.user.findUnique({
+    where: {email: userId},
+    select: {
       id: true,
       name: true,
       email: true,
       role: true,
+
       createdAt: true,
       updatedAt: true,
     },
-    })
-    return {
-       data: userInfo
-    }
-}
+  });
+
+  return {
+    data: user,
+  };
+};
+
 
 
 
@@ -30,7 +31,4 @@ const getMeService = async(userId: string) =>{
 
 export const UserService = {
    getMeService,
-   credentialsLogin,
-   getNewAccessToken
-   
 }

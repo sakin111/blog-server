@@ -28,7 +28,7 @@ export const seedAdmin = async () => {
                 role: Role.ADMIN,
             }
         })
-        console.log("Admin created:");
+        console.log("Admin created successfully");
         return Admin
     } catch (error) {
         console.log("error seeding Admin", error)
