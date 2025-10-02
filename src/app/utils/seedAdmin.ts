@@ -1,6 +1,6 @@
 
 import bcrypt from "bcryptjs"
-import { prisma } from "../config/db";
+import { prisma } from "../../config/db";
 import { Role } from "@prisma/client";
 
 
