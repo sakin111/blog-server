@@ -1,12 +1,13 @@
 import httpStatus from "http-status-codes"
 import { authService } from "./auth.service";
 import { createUserToken } from "../../utils/userToken";
-import { setAuthCookies } from "../../utils/setCookies";
+
 import { sendResponse } from "../../utils/SendResponse";
 import { catchAsync } from "../../utils/catchAsync";
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import AppError from "../../ErrorBuilder/AppError";
-import { cookieHandler } from "../../utils/cookieHandler";
+import { setAuthCookie } from "../../utils/setCookies";
+
 
 
 
@@ -15,7 +16,7 @@ const CredentialLogin = catchAsync(async (req: Request, res: Response) => {
     const user = loginInfo.user;
     const userToken = createUserToken(user);
   
-    setAuthCookies(res, userToken);
+    setAuthCookie(res, userToken);
     sendResponse(res, {
       success: true,
       statusCode: httpStatus.OK,
@@ -36,7 +37,7 @@ const getNewAccessToken = catchAsync(async (req: Request, res: Response) => {
   }
   const tokenInfo = await authService.getNewAccessToken(refreshToken)
 
-  setAuthCookies(res, tokenInfo)
+  setAuthCookie(res, tokenInfo)
 
   sendResponse(res, {
     success: true,
@@ -49,23 +50,27 @@ const getNewAccessToken = catchAsync(async (req: Request, res: Response) => {
 })
 
 
-const logout = catchAsync(async (req: Request, res: Response) => {
+const logout = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
 
+    res.clearCookie("accessToken", {
+        httpOnly: true,
+        secure: false,
+        sameSite: "lax",
+        path: "/" 
+    })
+    res.clearCookie("refreshToken", {
+        httpOnly: true,
+        secure: false,
+        sameSite: "lax",
+        path: "/" 
+    })
 
-  res.clearCookie("accessToken", cookieHandler())
-
-
-
-  res.clearCookie("refreshToken", cookieHandler())
-
-  sendResponse(res, {
-    success: true,
-    statusCode: httpStatus.OK,
-    message: "user logged out successfully",
-    data: null
-
-
-  })
+    sendResponse(res, {
+        success: true,
+        statusCode: httpStatus.OK,
+        message: "User Logged Out Successfully",
+        data: null,
+    })
 })
 
 export const authController = {

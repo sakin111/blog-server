@@ -39,7 +39,7 @@ export const createNewAccessToken= async (refreshToken: string) => {
     
 
     const jwtPayload = {
-        userId: isUserExist.id,
+        user: isUserExist.id,
         email: isUserExist.email,
         role: isUserExist.role
     }

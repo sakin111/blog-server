@@ -1,18 +1,31 @@
-import { Response } from "express"
-import { cookieHandler } from "./cookieHandler"
+import { Response } from "express";
+import { envVar } from "../config/env";
 
 
-
-export interface AuthToken {
-    accessToken?: string,
-    refreshToken?: string
+export interface AuthTokens {
+    accessToken?: string;
+    refreshToken?: string;
 }
 
-export const  setAuthCookies = (res: Response, tokenInfo: AuthToken) =>{
-    if(tokenInfo.accessToken){
-        res.cookie("accessToken",tokenInfo.accessToken,cookieHandler())
+export const setAuthCookie = (res: Response, tokenInfo: AuthTokens) => {
+    if (tokenInfo.accessToken) {
+        res.cookie("accessToken", tokenInfo.accessToken, {
+            httpOnly: true,
+            secure: envVar.NODE_ENV === "production" ? true : false,
+            sameSite: envVar.NODE_ENV === "production" ? "none" : "lax",
+        });
     }
-     if (tokenInfo.refreshToken) {
-      res.cookie("refreshToken",tokenInfo.refreshToken,cookieHandler())
-   }
+
+    if (tokenInfo.refreshToken) {
+        res.cookie("refreshToken", tokenInfo.refreshToken, {
+            httpOnly: true,
+            secure: envVar.NODE_ENV === "production" ? true : false,
+            sameSite: envVar.NODE_ENV === "production" ? "none" : "lax",
+        });
+    }
 }
+
+
+
+
+

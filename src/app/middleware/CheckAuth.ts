@@ -16,6 +16,7 @@ export const checkAuth = (...authRole : string[]) => (req:Request,res: Response,
         throw new AppError(403, "forbidden access to this route");
       }
       req.user = verifyToken
+
       next()
         
     } catch (error) {

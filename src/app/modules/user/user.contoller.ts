@@ -6,8 +6,8 @@ import { UserService } from "./user.service";
 import { catchAsync } from "../../utils/catchAsync";
 
 const  getMe = catchAsync(async(req: Request, res: Response) =>{
-        const userId = req.user.userId;
- 
+        const userId = req.user.email;
+
         const result = await UserService.getMeService(userId)
         sendResponse(res,{
            success: true,
