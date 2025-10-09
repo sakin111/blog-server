@@ -18,7 +18,21 @@ const  getMe = catchAsync(async(req: Request, res: Response) =>{
          })
 })
 
+const  aboutMe = catchAsync(async(req: Request, res: Response) =>{
+        const userId = req.user.email;
+
+        const result = await UserService.about(userId)
+        sendResponse(res,{
+           success: true,
+           statusCode: httpStatus.OK,
+           message: "user retrieve successfully",
+           data: result.data,   
+            
+         })
+})
+
 
 export const UserController = {
-   getMe
+   getMe,
+   aboutMe
 }

@@ -1,16 +1,11 @@
 import express from 'express';
 import { PostController } from './blog.controller';
+import { checkAuth } from '../../middleware/CheckAuth';
+import { Role } from '@prisma/client';
 
 const router = express.Router();
 
-router.post(
-    "/",
-    PostController.createPost
-)
+router.post("/blog",checkAuth(Role.ADMIN), PostController.createPost)
 
-// get all posts
-// get single post
-// update post
-// delete post
 
 export const blog = router;

@@ -9,7 +9,20 @@ export const getMeService = async (userId: string) => {
   const user = await prisma.user.findUnique({
     where: {email: userId }, 
   });
-  console.log(user)
+
+  if (!user) return { data: null };
+
+  const { password, ...userInfo } = user;
+  return { data: userInfo };
+};
+
+
+
+export const about = async (userId: string) => {
+  const user = await prisma.user.findUnique({
+    where: {email: userId }, 
+  });
+
 
   if (!user) return { data: null };
 
@@ -26,4 +39,5 @@ export const getMeService = async (userId: string) => {
 
 export const UserService = {
    getMeService,
+   about
 }
