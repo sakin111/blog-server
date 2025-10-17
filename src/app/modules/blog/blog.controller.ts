@@ -1,17 +1,33 @@
 import { Request, Response } from "express";
 import { PostService } from "./blog.service";
+import { catchAsync } from "../../utils/catchAsync";
+import { sendResponse } from "../../utils/SendResponse";
+import httpStatus from "http-status-codes"
 
-const createPost = async (req: Request, res: Response) => {
-    try {
-        const result = await PostService.createPost(req.body)
-        res.status(201).json(result);
-    } catch (error) {
-        res.status(500).send(error)
-    }
-}
 
-const getAllPosts = async (req: Request, res: Response) => {
-    try {
+
+const createPost = catchAsync(async(req: Request, res: Response) => {
+
+    const userId = Number(req.user?.user);
+    console.log("User ID from JWT:", userId);
+    console.log("Incoming blog payload:", req.body);
+
+    const result = await PostService.createPost(userId, req.body);
+     sendResponse(res,{
+           success: true,
+           statusCode: httpStatus.OK,
+           message: "user retrieve successfully",
+           data: result   
+            
+         }) 
+    
+  } )
+
+
+
+
+const getAllPosts = catchAsync(async (req: Request, res: Response) => {
+
         const page = Number(req.query.page) || 1;
         const limit = Number(req.query.limit) || 10;
         const search = (req.query.search as string) || "";
@@ -19,28 +35,99 @@ const getAllPosts = async (req: Request, res: Response) => {
         const tags = req.query.tags ? (req.query.tags as string).split(",") : []
 
         const result = await PostService.getAllPosts({ page, limit, search, isFeatured, tags });
-        res.json(result);
-    } catch (err) {
-        res.status(500).json({ error: "Failed to fetch posts", details: err });
-    }
-};
+        sendResponse(res, {
+            success: true,
+            statusCode: httpStatus.OK,
+            message: "Posts retrieved successfully",
+            data: result.data 
+        });
 
-const getPostById = async (req: Request, res: Response) => {
+})
+
+const getPostById = catchAsync(async(req: Request, res: Response) => {
     const post = await PostService.getPostById(Number(req.params.id));
-    if (!post) return res.status(404).json({ error: "Post not found" });
-    res.json(post);
-};
+    if (!post) {
+        sendResponse(res, {
+            success: false,
+            statusCode: httpStatus.NOT_FOUND,
+            message: "Post not found",
+            data: null
+        });
+        return;
+    }
+    sendResponse(res, {
+        success: true,
+        statusCode: httpStatus.OK,
+        message: "Post retrieved successfully",
+        data: post
+    });
+})
 
-const updatePost = async (req: Request, res: Response) => {
-    const payload = { id: Number(req.params.id), ...req.body };
-    const post = await PostService.updatePost(payload);
-    res.json(post);
-};
+export const updatePost = catchAsync(async (req: Request, res: Response) => {
+  const payload = { id: Number(req.params.id), ...req.body };
+  const updatedPost = await PostService.updatePost(payload);
 
-const deletePost = async (req: Request, res: Response) => {
-    await PostService.deletePost(Number(req.params.id));
-    res.json({ message: "Post deleted" });
-};
+  if (!updatedPost) {
+    sendResponse(res, {
+      success: false,
+      statusCode: httpStatus.NOT_FOUND,
+      message: "Post not found",
+      data: null,
+    });
+    return;
+  }
+
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: "Post updated successfully",
+    data: updatedPost,
+  });
+});
+
+
+export const updateUser = catchAsync(async (req: Request, res: Response) => {
+  const payload = { id: Number(req.params.id), ...req.body };
+  const updatedPost = await PostService.updatePost(payload);
+
+  if (!updatedPost) {
+    sendResponse(res, {
+      success: false,
+      statusCode: httpStatus.NOT_FOUND,
+      message: "user not found",
+      data: null,
+    });
+    return;
+  }
+
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: "user updated successfully",
+    data: updatedPost,
+  });
+});
+
+export const deletePost = catchAsync(async (req: Request, res: Response) => {
+  const deleted = await PostService.deletePost(Number(req.params.id));
+
+  if (!deleted) {
+    sendResponse(res, {
+      success: false,
+      statusCode: httpStatus.NOT_FOUND,
+      message: "Post not found",
+      data: null,
+    });
+    return;
+  }
+
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: "Post deleted successfully",
+    data: null,
+  });
+});
 
 
 export const PostController = {

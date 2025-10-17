@@ -19,9 +19,24 @@ const  getMe = catchAsync(async(req: Request, res: Response) =>{
 })
 
 const  aboutMe = catchAsync(async(req: Request, res: Response) =>{
-        const userId = req.user.email;
+        const email = req.user?.email
 
-        const result = await UserService.about(userId)
+
+        const result = await UserService.about(email!)
+        sendResponse(res,{
+           success: true,
+           statusCode: httpStatus.OK,
+           message: "user retrieve successfully",
+           data: result.data,   
+            
+         })
+})
+
+const  updateMe = catchAsync(async(req: Request, res: Response) =>{
+        const email = req.user?.email
+        const payload = req.body
+
+        const result = await UserService.UpdateMe(email,payload)
         sendResponse(res,{
            success: true,
            statusCode: httpStatus.OK,
@@ -34,5 +49,6 @@ const  aboutMe = catchAsync(async(req: Request, res: Response) =>{
 
 export const UserController = {
    getMe,
-   aboutMe
+   aboutMe,
+   updateMe
 }

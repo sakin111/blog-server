@@ -11,7 +11,7 @@ export const checkAuth = (...authRole : string[]) => (req:Request,res: Response,
            if (!accessToken) {
         throw new AppError(403, "token is not provided");
       }
-      const verifyToken = verifyTokens(accessToken,envVar.JWT_ACCESS_SECRET) as JwtPayload
+      const verifyToken = verifyTokens(accessToken,envVar.JWT_ACCESS_SECRET) as JwtPayload & { user: number, role: string };
       if(!authRole.includes(verifyToken.role)){
         throw new AppError(403, "forbidden access to this route");
       }

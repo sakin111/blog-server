@@ -7,7 +7,8 @@ const router = Router()
 
 
 router.get("/me", checkAuth(...Object.values(Role)), UserController.getMe)
-router.get("/about", checkAuth(...Object.values(Role)), UserController.aboutMe)
+router.get("/about", UserController.aboutMe)
+router.patch("/:id", checkAuth(...Object.values(Role)), UserController.updateMe)
 
 
 export const user = router;

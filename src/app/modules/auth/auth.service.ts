@@ -18,15 +18,14 @@ const credentialsLogin = async (payload: Partial<User>) => {
     const isUserExist = await prisma.user.findUnique({where:{email}})
 
     if (!isUserExist) {
-        throw new AppError(httpStatus.BAD_REQUEST, "Email does not exist")
+        throw new AppError(httpStatus.NOT_FOUND, "user not found")
     }
 
     const isPasswordMatched = await bcrypt.compare(password as string, isUserExist.password as string)
 
-    if (!isPasswordMatched) {
-        throw new AppError(httpStatus.BAD_REQUEST, "Incorrect Password")
-    }
-
+ if (!isPasswordMatched) {
+    throw new AppError(httpStatus.UNAUTHORIZED, "Invalid credentials");
+  }
     const userTokens = createUserToken(isUserExist)
 
     const { password: pass, ...rest } = isUserExist

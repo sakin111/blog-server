@@ -26,6 +26,12 @@ export const seedAdmin = async () => {
                 email: process.env.ADMIN_EMAIL as string,
                 password: hashPassword,
                 role: Role.ADMIN,
+                profile: {
+                    create: {
+                        email: process.env.ADMIN_EMAIL as string,
+                        bio: "Admin profile",
+                    },
+                },
             }
         })
         console.log("Admin created successfully");

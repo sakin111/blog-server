@@ -1,5 +1,7 @@
 import { Post, Prisma } from "@prisma/client";
 import { prisma } from "../../../config/db";
+import httpStatus from "http-status-codes"
+import AppError from "../../ErrorBuilder/AppError";
 
 
 interface UpdatePostPayload {
@@ -14,34 +16,85 @@ interface UpdatePostPayload {
 
 
 
-const createPost = async (payload: Prisma.PostCreateInput): Promise<Post> => {
-    const result = await prisma.post.create({
-        data: payload,
-        include: {
-            author: {
-                select: {
-                    id: true,
-                    name: true,
-                    email: true
-                }
-            }
-        }
-    })
+ const createPost = async (
+  userId: number,
+  payload: Prisma.PostCreateInput
+) => {
 
-    return result;
-}
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { id: true, role: true },
+  });
+
+  if (!user) throw new AppError(404, "User not found");
+  if (user.role !== "ADMIN") throw new AppError(403, "Only admins can create posts");
+
+    const { tags, ...rest } = payload;
+    console.log(tags,"this is tags");
+    const post = await prisma.post.create({
+      data: {
+        ...rest,
+        tags: tags || [],
+        author: { connect: { id: userId } },
+      },
+      include: {
+        author: { select: { id: true, name: true, email: true } },
+      },
+    });
+
+    return post;
+
+};
+
+
+
+
+
+
+
 
 const updatePost = async (payload: UpdatePostPayload): Promise<Post> => {
   const { id, ...data } = payload;
 
-    // Build a Prisma-compatible update object and only include fields that are defined.
+
     const prismaData: Prisma.PostUpdateInput = {
         ...(data.title !== undefined && { title: data.title }),
         ...(data.content !== undefined && { content: data.content }),
         ...(data.thumbnail !== undefined && { thumbnail: data.thumbnail }),
         ...(data.tags !== undefined && { tags: data.tags }),
         ...(data.isFeatured !== undefined && { isFeatured: data.isFeatured }),
-        ...(data.views !== undefined && { views: data.views }),
+
+    } as Prisma.PostUpdateInput;
+
+    const result = await prisma.post.update({
+        where: { id },
+        data: prismaData,
+        include: {
+            author: {
+                select: {
+                    id: true,
+                    name: true,
+                    email: true,
+                },
+            },
+        },
+    });
+
+  return result;
+};
+
+
+const updateUser = async (payload: UpdatePostPayload): Promise<Post> => {
+  const { id, ...data } = payload;
+
+
+    const prismaData: Prisma.PostUpdateInput = {
+        ...(data.title !== undefined && { title: data.title }),
+        ...(data.content !== undefined && { content: data.content }),
+        ...(data.thumbnail !== undefined && { thumbnail: data.thumbnail }),
+        ...(data.tags !== undefined && { tags: data.tags }),
+        ...(data.isFeatured !== undefined && { isFeatured: data.isFeatured }),
+
     } as Prisma.PostUpdateInput;
 
     const result = await prisma.post.update({
@@ -144,5 +197,6 @@ export const PostService = {
     updatePost,
     getAllPosts,
     getPostById,
-    deletePost
+    deletePost,
+    updateUser
 }
