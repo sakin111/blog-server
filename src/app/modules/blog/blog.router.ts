@@ -9,6 +9,9 @@ router.post("/blogPost",checkAuth(Role.ADMIN), PostController.createPost)
 router.get("/blogGet",PostController.getAllPosts)
 router.get("/:id", PostController.getPostById);
 router.patch("/:id",checkAuth(Role.ADMIN), PostController.updatePost);
+router.patch("/project/:id",checkAuth(Role.ADMIN), PostController.updateProject);
+router.get("/project",checkAuth(Role.ADMIN), PostController.getAllProject);
+router.get("/project/:id",checkAuth(Role.ADMIN), PostController.getProjectById);
 router.delete("/:id",checkAuth(Role.ADMIN), PostController.deletePost);
 
 

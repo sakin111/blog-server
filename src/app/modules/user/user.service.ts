@@ -56,6 +56,7 @@ export const UpdateMe = async (email: string, payload: UpdateProfileInput) => {
 
 const data: any = {};
 
+if (payload.name!== undefined) data.name = payload.name;
 if (payload.bio !== undefined) data.bio = payload.bio;
 if (payload.location !== undefined) data.location = payload.location;
 if (payload.skills !== undefined) data.skills = payload.skills;

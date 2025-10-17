@@ -108,6 +108,64 @@ export const updateUser = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+
+export const updateProject = catchAsync(async (req: Request, res: Response) => {
+  const payload = { id: Number(req.params.id), ...req.body };
+  const updated = await PostService.updateProject(payload);
+
+  if (!updated) {
+    sendResponse(res, {
+      success: false,
+      statusCode: httpStatus.NOT_FOUND,
+      message: "Project not found",
+      data: null,
+    });
+    return;
+  }
+
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: "Project updated successfully",
+    data: updated,
+  });
+});
+export const getAllProject = catchAsync(async (req: Request, res: Response) => {
+  const page = Number(req.query.page) || 1;
+  const limit = Number(req.query.limit) || 10;
+  const search = (req.query.search as string) || "";
+  const tags = req.query.tags ? (req.query.tags as string).split(",") : [];
+
+  const result = await PostService.getAllProject({ page, limit, search, tags });
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: "Projects retrieved successfully",
+    data: result.data,
+  });
+});
+
+export const getProjectById = catchAsync(async (req: Request, res: Response) => {
+  const id = Number(req.params.id);
+  const project = await PostService.getProjectById(id);
+
+  if (!project) {
+    sendResponse(res, {
+      success: false,
+      statusCode: httpStatus.NOT_FOUND,
+      message: "Project not found",
+      data: null,
+    });
+    return;
+  }
+
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: "Project retrieved successfully",
+    data: project,
+  });
+});
 export const deletePost = catchAsync(async (req: Request, res: Response) => {
   const deleted = await PostService.deletePost(Number(req.params.id));
 
@@ -135,6 +193,9 @@ export const PostController = {
     getAllPosts,
     getPostById,
     updatePost,
-    deletePost
+  deletePost,
+  updateProject,
+  getAllProject,
+  getProjectById
 
 }

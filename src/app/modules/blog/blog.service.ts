@@ -1,6 +1,6 @@
-import { Post, Prisma } from "@prisma/client";
+import { Post, Prisma, Project } from "@prisma/client";
 import { prisma } from "../../../config/db";
-import httpStatus from "http-status-codes"
+
 import AppError from "../../ErrorBuilder/AppError";
 
 
@@ -12,6 +12,15 @@ interface UpdatePostPayload {
   tags?: string[];
   views?: number;
   isFeatured?: boolean;
+}
+
+interface UpdateProjectPayload {
+    id: number;
+    thumbnail?: string;
+    liveLink?: string;
+    liveSite?: string;
+    description?: string;
+    features?: string[];
 }
 
 
@@ -84,6 +93,8 @@ const updatePost = async (payload: UpdatePostPayload): Promise<Post> => {
 };
 
 
+
+
 const updateUser = async (payload: UpdatePostPayload): Promise<Post> => {
   const { id, ...data } = payload;
 
@@ -110,6 +121,26 @@ const updateUser = async (payload: UpdatePostPayload): Promise<Post> => {
             },
         },
     });
+
+  return result;
+};
+
+
+const updateProject = async (payload: UpdateProjectPayload): Promise<Project> => {
+  const { id, ...data } = payload;
+
+  const prismaData: Prisma.ProjectUpdateInput = {
+    ...(data.thumbnail !== undefined && { thumbnail: data.thumbnail }),
+    ...(data.description !== undefined && { description: data.description }),
+    ...(data.features !== undefined && { features: data.features }),
+    ...(data.liveLink !== undefined && { liveLink: data.liveLink }),
+    ...(data.liveSite !== undefined && { liveSite: data.liveSite }),
+  } as Prisma.ProjectUpdateInput;
+
+  const result = await prisma.project.update({
+    where: { id },
+    data: prismaData,
+  });
 
   return result;
 };
@@ -169,22 +200,68 @@ const getAllPosts = async ({
     };
 };
 
+const getAllProject = async ({
+    page = 1,
+    limit = 10,
+    search,
+    tags,
+}: {
+    page?: number;
+    limit?: number;
+    search?: string;
+    tags?: string[];
+}) => {
+    const skip = (page - 1) * limit;
+
+    const where: any = {
+        AND: [
+            search && { description: { contains: search, mode: "insensitive" } },
+            tags && tags.length > 0 && { features: { hasEvery: tags } },
+        ].filter(Boolean),
+    };
+
+    const result = await prisma.project.findMany({
+        skip,
+        take: limit,
+        where,
+        orderBy: { createdAt: "desc" },
+    });
+
+    const total = await prisma.project.count({ where });
+
+    return {
+        data: result,
+        pagination: {
+            page,
+            limit,
+            total,
+            totalPages: Math.ceil(total / limit),
+        },
+    };
+};
+
+const getProjectById = async (id: number) => {
+    return await prisma.project.findUnique({
+        where: { id },
+    });
+};
+
 const getPostById = async (id: number) => {
     return await prisma.$transaction(async (tx) => {
         await tx.post.update({
             where: { id },
             data: {
                 views: {
-                    increment: 1
-                }
-            }
+                    increment: 1,
+                },
+            },
         });
 
         return await tx.post.findUnique({
             where: { id },
             include: { author: true },
         });
-    })
+    });
 };
 
 const deletePost = async (id: number) => {
@@ -198,5 +275,8 @@ export const PostService = {
     getAllPosts,
     getPostById,
     deletePost,
-    updateUser
+    updateUser,
+    updateProject,
+    getAllProject,
+    getProjectById
 }
