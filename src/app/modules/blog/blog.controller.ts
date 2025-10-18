@@ -145,6 +145,30 @@ export const getAllProject = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+
+export const postProject = catchAsync(async (req: Request, res: Response) => {
+const userId = Number(req.user?.user); 
+    if (!userId) {
+      return sendResponse(res, {
+        success: false,
+        statusCode: httpStatus.UNAUTHORIZED,
+        message: "Unauthorized user",
+        data: null
+      });
+    }
+
+    const result = await PostService.projectService(req.body, userId);
+
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.CREATED,
+      message: "Project created successfully",
+      data: result,
+    });
+  })
+
+
+
 export const getProjectById = catchAsync(async (req: Request, res: Response) => {
   const id = Number(req.params.id);
   const project = await PostService.getProjectById(id);
@@ -196,6 +220,7 @@ export const PostController = {
   deletePost,
   updateProject,
   getAllProject,
-  getProjectById
+  getProjectById,
+  postProject
 
 }

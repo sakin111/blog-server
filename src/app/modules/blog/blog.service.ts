@@ -269,6 +269,25 @@ const deletePost = async (id: number) => {
 };
 
 
+
+const projectService = async (payload: Prisma.ProjectCreateInput,
+    userId: number) => {
+       const newProject = await prisma.project.create({
+      data: {
+        ...payload,
+        user: { connect: { id: userId } },
+      },
+    });
+return newProject; 
+};
+
+
+
+
+
+
+
+
 export const PostService = {
     createPost,
     updatePost,
@@ -278,5 +297,6 @@ export const PostService = {
     updateUser,
     updateProject,
     getAllProject,
-    getProjectById
+    getProjectById,
+    projectService
 }
