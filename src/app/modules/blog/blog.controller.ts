@@ -45,7 +45,11 @@ const getAllPosts = catchAsync(async (req: Request, res: Response) => {
 })
 
 const getPostById = catchAsync(async(req: Request, res: Response) => {
-    const post = await PostService.getPostById(Number(req.params.id));
+
+  const id = Number(req.params.id)
+  console.log("Incoming ID:", req.params.id);
+
+    const post = await PostService.getPostById(id);
     if (!post) {
         sendResponse(res, {
             success: false,
@@ -190,8 +194,32 @@ export const getProjectById = catchAsync(async (req: Request, res: Response) => 
     data: project,
   });
 });
+
+
 export const deletePost = catchAsync(async (req: Request, res: Response) => {
   const deleted = await PostService.deletePost(Number(req.params.id));
+
+  if (!deleted) {
+    sendResponse(res, {
+      success: false,
+      statusCode: httpStatus.NOT_FOUND,
+      message: "Post not found",
+      data: null,
+    });
+    return;
+  }
+
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: "Post deleted successfully",
+    data: null,
+  });
+});
+
+
+export const deleteProject = catchAsync(async (req: Request, res: Response) => {
+  const deleted = await PostService.deleteProject(Number(req.params.id));
 
   if (!deleted) {
     sendResponse(res, {
@@ -218,6 +246,7 @@ export const PostController = {
     getPostById,
     updatePost,
   deletePost,
+  deleteProject,
   updateProject,
   getAllProject,
   getProjectById,

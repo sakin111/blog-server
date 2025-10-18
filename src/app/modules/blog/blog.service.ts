@@ -268,6 +268,10 @@ const deletePost = async (id: number) => {
     return prisma.post.delete({ where: { id } });
 };
 
+const deleteProject = async (id: number) => {
+    return prisma.project.delete({ where: { id } });
+};
+
 
 
 const projectService = async (payload: Prisma.ProjectCreateInput,
@@ -294,6 +298,7 @@ export const PostService = {
     getAllPosts,
     getPostById,
     deletePost,
+    deleteProject,
     updateUser,
     updateProject,
     getAllProject,

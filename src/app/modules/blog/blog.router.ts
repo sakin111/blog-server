@@ -14,6 +14,7 @@ router.patch("/project/:id",checkAuth(Role.ADMIN), PostController.updateProject)
 router.get("/project", PostController.getAllProject);
 router.get("/project/:id",checkAuth(Role.ADMIN), PostController.getProjectById);
 router.delete("/:id",checkAuth(Role.ADMIN), PostController.deletePost);
+router.delete("/project/:id",checkAuth(Role.ADMIN), PostController.deleteProject);
 
 
 export const blog = router;
