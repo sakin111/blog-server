@@ -47,7 +47,7 @@ const getAllPosts = catchAsync(async (req: Request, res: Response) => {
 const getPostById = catchAsync(async(req: Request, res: Response) => {
 
   const id = Number(req.params.id)
-  console.log("Incoming ID:", req.params.id);
+
 
     const post = await PostService.getPostById(id);
     if (!post) {

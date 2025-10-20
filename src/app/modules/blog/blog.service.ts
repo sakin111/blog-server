@@ -39,7 +39,6 @@ interface UpdateProjectPayload {
   if (user.role !== "ADMIN") throw new AppError(403, "Only admins can create posts");
 
     const { tags, ...rest } = payload;
-    console.log(tags,"this is tags");
     const post = await prisma.post.create({
       data: {
         ...rest,
