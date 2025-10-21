@@ -3,6 +3,7 @@ import cors from "cors";
 import express from "express";
 import { router } from "./app/route";
 import cookieParser from "cookie-parser";
+import { envVar } from "./app/config/env";
 
 
 const app = express();
@@ -12,7 +13,7 @@ app.use(express.json());
 app.set("trust proxy",1)
 app.use(
   cors({
-    origin: "http://localhost:3000",
+    origin: envVar.FRONTEND_url,
     credentials: true,
   })
 );
