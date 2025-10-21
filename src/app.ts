@@ -13,7 +13,7 @@ app.use(express.json());
 app.set("trust proxy",1)
 app.use(
   cors({
-    origin: envVar.FRONTEND_url,
+    origin: envVar.FRONTEND_URL,
     credentials: true,
   })
 );
