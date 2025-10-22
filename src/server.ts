@@ -33,10 +33,12 @@ async function startServer() {
   }
 }
 
-(async() =>{
-  await startServer(),
-  await seedAdmin()
-})()
+(async () => {
+  await connectToDB();
+  await seedAdmin();
+  await startServer();
+})();
+
 
 
 process.on("SIGTERM", (err) => {
