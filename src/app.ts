@@ -12,14 +12,14 @@ app.use(cookieParser());
 app.use(express.json());
 app.use(compression());
 
-// ✅ CORS configuration for Vercel + Render
+
 app.use(
   cors({
     origin: [
-      "https://blog-app-pied-three.vercel.app", // your frontend
-      "http://localhost:3000",                  // local dev
+      envVar.FRONTEND_URL, 
+      "http://localhost:3000",                 
     ],
-    credentials: true, // ✅ allow cookies
+    credentials: true, 
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
   })
@@ -29,7 +29,7 @@ app.use(
 app.use("/api/v1", router);
 
 app.get("/", (_req, res) => {
-  res.send("Server is running 🚀");
+  res.send("Server is running");
 });
 
 app.use((req, res) => {
